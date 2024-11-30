@@ -40,11 +40,12 @@ router.get("/:id", async (req, res) => {
 // Rota para atualizar um item por ID (PUT /api/seed/:id)
 router.put("/:id", async (req, res) => {
   try {
-    const updatedSeed = await Seed.findByIdAndUpdate(
-      req.params.id,
+    const updatedSeed = await Seed.findOneAndUpdate(
+      { seed: req.params.id }, // Busca pelo campo seed
       req.body,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true } // Retorna o item atualizado
     );
+
     if (updatedSeed) {
       res.status(200).json(updatedSeed);
     } else {
@@ -55,10 +56,11 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// Rota para deletar um item por ID (DELETE /api/seed/:id)
+// Deletar um item pelo campo seed (DELETE /api/seed/:id)
 router.delete("/:id", async (req, res) => {
   try {
-    const deletedSeed = await Seed.findByIdAndDelete(req.params.id);
+    const deletedSeed = await Seed.findOneAndDelete({ seed: req.params.id }); // Busca pelo campo seed
+
     if (deletedSeed) {
       res.status(200).json({ message: "Item excluído com sucesso" });
     } else {
@@ -68,5 +70,6 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 module.exports = router; // Exporta o roteador para ser usado no app.js
