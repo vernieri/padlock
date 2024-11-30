@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 // Rota para criar um novo item (POST /api/seed)
 router.post("/", async (req, res) => {
   try {
-    const newSeed = new Seed(req.body); // Cria o item com base no body recebido
+    const newSeed = new Seed(req.body); // O campo 'seed' será gerado automaticamente
     const savedSeed = await newSeed.save(); // Salva no banco de dados
     res.status(201).json(savedSeed);
   } catch (error) {
@@ -23,10 +23,10 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Rota para buscar um item por ID (GET /api/seed/:id)
+// Rota para buscar um item por Seed (GET /api/seed/:id)
 router.get("/:id", async (req, res) => {
   try {
-    const seed = await Seed.findById(req.params.id); // Busca pelo ID
+    const seed = await Seed.findOne({ seed: req.params.id }); // Busca pelo campo seed
     if (seed) {
       res.status(200).json(seed);
     } else {
