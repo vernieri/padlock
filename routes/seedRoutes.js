@@ -71,5 +71,31 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// Nova rota: Buscar seeds por account e service
+router.post("/search", async (req, res) => {
+  const { account, service } = req.body;
+
+  // Validação: Campos account e service são obrigatórios
+  if (!account || !service) {
+    return res.status(400).json({ error: "Os campos 'account' e 'service' são obrigatórios" });
+  }
+
+  try {
+    // Busca no banco de dados pelos critérios account e service
+    const seeds = await Seed.find({ account, service });
+
+    if (seeds.length === 0) {
+      return res.status(404).json({ error: "Nenhuma seed encontrada para os critérios fornecidos" });
+    }
+
+    // Retorna as seeds encontradas
+    res.status(200).json({
+      message: "Seeds encontradas com sucesso",
+      seeds,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = router; // Exporta o roteador para ser usado no app.js
