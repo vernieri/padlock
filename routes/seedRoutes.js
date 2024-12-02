@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Seed = require("../models/seedModel"); // Importando o modelo atualizado
+const Seed = require("../models/seedModel"); // Certifique-se de que está importando corretamente
 
 // Rota para listar todos os itens (GET /api/seed)
 router.get("/", async (req, res) => {
@@ -23,15 +23,13 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Rota para buscar um item por Seed (GET /api/seed/:id)
 router.get("/:id", async (req, res) => {
   try {
     const seed = await Seed.findOne({ seed: req.params.id }); // Busca pelo campo seed
-    if (seed) {
-      res.status(200).json(seed);
-    } else {
-      res.status(404).json({ message: "Item não encontrado" });
+    if (!seed) {
+      return res.status(404).json({ error: "Seed não encontrada" });
     }
+    res.status(200).json(seed);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -73,25 +71,30 @@ router.delete("/:id", async (req, res) => {
 
 // Nova rota: Buscar seeds por account e service
 router.post("/search", async (req, res) => {
-  const { account, service } = req.body;
+  const { service, account } = req.body;
 
-  // Validação: Campos account e service são obrigatórios
-  if (!account || !service) {
-    return res.status(400).json({ error: "Os campos 'account' e 'service' são obrigatórios" });
+  // Validação: Campos obrigatórios
+  if (!service || !account) {
+    return res.status(400).json({ error: "Os campos 'service' e 'account' são obrigatórios" });
   }
 
   try {
-    // Busca no banco de dados pelos critérios account e service
-    const seeds = await Seed.find({ account, service });
+    // Busca seeds com base em service e account
+    const seeds = await Seed.find({ service, account });
 
     if (seeds.length === 0) {
       return res.status(404).json({ error: "Nenhuma seed encontrada para os critérios fornecidos" });
     }
 
-    // Retorna as seeds encontradas
+    // Descriptografa o pass antes de retornar
+    const results = seeds.map((seed) => ({
+      ...seed.toObject(),
+      pass: seed.decryptPass(), // Chama a função de descriptografia do modelo
+    }));
+
     res.status(200).json({
       message: "Seeds encontradas com sucesso",
-      seeds,
+      seeds: results,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
