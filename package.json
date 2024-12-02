@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "mongoose": "^8.8.3",
+    "notenv": "^2.0.3",
     "uuid": "^11.0.3"
   }
 }
