@@ -69,34 +69,43 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// Nova rota: Buscar seeds por account e service
+// Rota POST /api/seed/search para buscar seeds pelo service e account
 router.post("/search", async (req, res) => {
   const { service, account } = req.body;
 
-  // Validação: Campos obrigatórios
   if (!service || !account) {
     return res.status(400).json({ error: "Os campos 'service' e 'account' são obrigatórios" });
   }
 
   try {
-    // Busca seeds com base em service e account
     const seeds = await Seed.find({ service, account });
 
     if (seeds.length === 0) {
       return res.status(404).json({ error: "Nenhuma seed encontrada para os critérios fornecidos" });
     }
 
-    // Descriptografa o pass antes de retornar
-    const results = seeds.map((seed) => ({
-      ...seed.toObject(),
-      pass: seed.decryptPass(), // Chama a função de descriptografia do modelo
-    }));
+    const results = seeds.map((seed) => {
+      try {
+        // Descriptografa o pass e inclui no resultado
+        return {
+          ...seed.toObject(),
+          pass: seed.decryptPass(),
+        };
+      } catch (error) {
+        console.error("Erro ao descriptografar a seed:", seed._id, error.message);
+        return {
+          ...seed.toObject(),
+          pass: null, // Retorna nulo se houver erro
+        };
+      }
+    });
 
     res.status(200).json({
       message: "Seeds encontradas com sucesso",
       seeds: results,
     });
   } catch (error) {
+    console.error("Erro ao buscar seeds:", error.message);
     res.status(500).json({ error: error.message });
   }
 });

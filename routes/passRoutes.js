@@ -6,7 +6,7 @@ const Seed = require("../models/seedModel"); // Modelo do MongoDB
 //const { Seed, decryptPass } = require("../models/seedModel");
 
 
-// Rota POST para criar um pass criptografado
+// Rota POST /api/pass para gerar e criptografar um pass
 router.post("/", async (req, res) => {
   const { seed } = req.body;
 
@@ -15,6 +15,7 @@ router.post("/", async (req, res) => {
   }
 
   try {
+    // Busca a seed no banco de dados
     const data = await Seed.findOne({ seed });
 
     if (!data) {
@@ -29,15 +30,18 @@ router.post("/", async (req, res) => {
 
     // Concatenar SHA256 + salt e gerar SHA1
     const combined = sha256Hash + salt;
-    const sha1Hash = crypto.createHash("sha1").update(combined).digest("hex");
+    const sha1Hash = crypto.createHash("sha1").update(combined).digest();
+
+    // Converter o SHA1 para Base64
+    const passBase64 = sha1Hash.toString("base64");
 
     // Atualizar o pass criptografado no MongoDB
-    data.pass = sha1Hash; // O pre-save do modelo cuidará da criptografia
+    data.pass = passBase64; // O pre-save no modelo cuidará da criptografia em AES
     await data.save();
 
     res.status(200).json({
       message: "Pass gerado e criptografado com sucesso!",
-      pass: sha1Hash, // O pass antes da criptografia
+      pass: passBase64, // Retorna o pass em Base64
       salt: salt,
     });
   } catch (error) {
