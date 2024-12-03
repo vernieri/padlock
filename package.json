@@ -5,5 +5,15 @@
     "mongoose": "^8.8.3",
     "notenv": "^2.0.3",
     "uuid": "^11.0.3"
+
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.2",
+    "supertest": "^7.0.0"
+  },
+
+  "scripts": {
+    "test": "jest"
   }
 }
