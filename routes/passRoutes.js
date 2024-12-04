@@ -3,11 +3,12 @@ const crypto = require("crypto"); // Biblioteca para hash
 const { v4: uuidv4 } = require("uuid"); // Para gerar o salt aleatório
 const router = express.Router();
 const Seed = require("../models/seedModel"); // Modelo do MongoDB
+const { protect } = require("../middleware/authMiddleware");
 //const { Seed, decryptPass } = require("../models/seedModel");
 
 
 // Rota POST /api/pass para gerar e criptografar um pass
-router.post("/", async (req, res) => {
+router.post("/", protect, async (req, res) => {
   const { seed } = req.body;
 
   if (!seed) {
@@ -52,7 +53,7 @@ router.post("/", async (req, res) => {
 
 
 // Rota PUT /api/pass/:seed
-router.put("/:seed", async (req, res) => {
+router.put("/:seed", protect, async (req, res) => {
   const { seed } = req.params;
   const { service, account } = req.body;
 
@@ -83,7 +84,7 @@ router.put("/:seed", async (req, res) => {
 });
 
 // Rota DELETE /api/pass/:seed
-router.delete("/:seed", async (req, res) => {
+router.delete("/:seed", protect, async (req, res) => {
   const { seed } = req.params;
 
   try {
@@ -101,7 +102,7 @@ router.delete("/:seed", async (req, res) => {
 });
 
 // Rota GET para descriptografar um pass
-router.get("/:seed/decrypt", async (req, res) => {
+router.get("/:seed/decrypt", protect, async (req, res) => {
   const { seed } = req.params;
 
   try {
