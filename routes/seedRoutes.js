@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Seed = require("../models/seedModel"); // Certifique-se de que está importando corretamente
+const { protect } = require("../middleware/authMiddleware");
 
 // Rota para listar todos os itens (GET /api/seed)
-router.get("/", async (req, res) => {
+router.get("/", protect, async (req, res) => {
   try {
     const seeds = await Seed.find(); // Busca todos os itens no banco
     res.status(200).json(seeds);
@@ -13,7 +14,7 @@ router.get("/", async (req, res) => {
 });
 
 // Rota para criar um novo item (POST /api/seed)
-router.post("/", async (req, res) => {
+router.post("/", protect, async (req, res) => {
   try {
     const newSeed = new Seed(req.body); // O campo 'seed' será gerado automaticamente
     const savedSeed = await newSeed.save(); // Salva no banco de dados
@@ -23,7 +24,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", protect, async (req, res) => {
   try {
     const seed = await Seed.findOne({ seed: req.params.id }); // Busca pelo campo seed
     if (!seed) {
@@ -36,7 +37,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Rota para atualizar um item por ID (PUT /api/seed/:id)
-router.put("/:id", async (req, res) => {
+router.put("/:id", protect, async (req, res) => {
   try {
     const updatedSeed = await Seed.findOneAndUpdate(
       { seed: req.params.id }, // Busca pelo campo seed
@@ -55,7 +56,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Deletar um item pelo campo seed (DELETE /api/seed/:id)
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", protect, async (req, res) => {
   try {
     const deletedSeed = await Seed.findOneAndDelete({ seed: req.params.id }); // Busca pelo campo seed
 
@@ -70,7 +71,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // Rota POST /api/seed/search para buscar seeds pelo service e account
-router.post("/search", async (req, res) => {
+router.post("/search", protect, async (req, res) => {
   const { service, account } = req.body;
 
   if (!service || !account) {
