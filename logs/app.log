@@ -19,3 +19,7 @@
 2024-12-10 13:07:59 [WARN]: Falha de login para o e-mail: undefined
 2024-12-10 13:14:55 [INFO]: Servidor rodando na porta 3000
 2024-12-10 13:14:55 [INFO]: Conectado ao MongoDB com sucesso
+2024-12-10 13:53:30 [INFO]: Servidor rodando na porta 3000
+2024-12-10 13:53:30 [INFO]: Conectado ao MongoDB com sucesso
+2024-12-10 13:53:48 [INFO]: Usuário logado com sucesso: joana_dark (joana@example.com)
+2024-12-10 13:54:17 [INFO]: Seed criada pelo usuário: joana_dark (joana@example.com)
