@@ -5,7 +5,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.3",
     "notenv": "^2.0.3",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "dotenv": "^16.4.7",
