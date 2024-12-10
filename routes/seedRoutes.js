@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Seed = require("../models/seedModel"); // Certifique-se de que está importando corretamente
 const { protect } = require("../middleware/authMiddleware");
+const logger = require("../utils/logger"); // Importa o logger
 
 // Rota para listar todos os itens (GET /api/seed)
 router.get("/", protect, async (req, res) => {
@@ -18,6 +19,7 @@ router.post("/", protect, async (req, res) => {
   try {
     const newSeed = new Seed(req.body); // O campo 'seed' será gerado automaticamente
     const savedSeed = await newSeed.save(); // Salva no banco de dados
+    logger.info(`Seed criada pelo usuário: ${req.user.username} (${req.user.email})`);
     res.status(201).json(savedSeed);
   } catch (error) {
     res.status(400).json({ error: error.message });
