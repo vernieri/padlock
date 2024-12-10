@@ -1,6 +1,7 @@
 const request = require("supertest");
 const app = require("../app"); // Certifique-se de exportar o app no app.js
 const { connectDB, disconnectDB } = require("./setupTestDB");
+require("dotenv").config();
 
 beforeAll(async () => {
   await connectDB();

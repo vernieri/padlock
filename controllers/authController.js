@@ -1,10 +1,10 @@
-const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
 
-// Função para gerar um token JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+// Gera o token JWT
+const generateToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || "1d",
   });
 };
 
@@ -13,6 +13,11 @@ exports.register = async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "E-mail já registrado" });
+    }
+
     const user = await User.create({ username, email, password });
     const token = generateToken(user._id);
 
@@ -26,13 +31,12 @@ exports.register = async (req, res) => {
   }
 };
 
-// Login de usuário
+// Login do usuário
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
-
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ error: "Credenciais inválidas" });
     }
@@ -46,5 +50,15 @@ exports.login = async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+// Listar todos os usuários (apenas para admin, opcional)
+exports.listUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
